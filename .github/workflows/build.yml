@@ -20,27 +20,32 @@ jobs:
       - name: Build JAR
         run: mvn -q package -DskipTests
 
+      - name: Prepare staging
+        run: mkdir -p staging && cp target/cat.jar staging/
+
       - name: Build .deb
         run: |
           jpackage \
-            --input target \
+            --input staging \
             --main-jar cat.jar \
             --main-class com.cat.Main \
             --name cat-java \
             --app-version ${GITHUB_REF_NAME#v} \
             --type deb \
-            --dest dist
+            --dest dist \
+            --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Build AppImage
         run: |
           jpackage \
-            --input target \
+            --input staging \
             --main-jar cat.jar \
             --main-class com.cat.Main \
             --name cat-java \
             --app-version ${GITHUB_REF_NAME#v} \
             --type app-image \
-            --dest appimage-build
+            --dest appimage-build \
+            --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
           # Package as AppImage
           sudo apt-get install -y libfuse2
           wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
@@ -81,27 +86,34 @@ jobs:
       - name: Build JAR
         run: mvn -q package -DskipTests
 
+      - name: Prepare staging
+        run: |
+          New-Item -ItemType Directory -Force -Path staging
+          Copy-Item target/cat.jar staging/
+
       - name: Build .exe
         run: |
           jpackage `
-            --input target `
+            --input staging `
             --main-jar cat.jar `
             --main-class com.cat.Main `
             --name cat-java `
             --app-version $($env:GITHUB_REF_NAME -replace '^v','') `
             --type exe `
-            --dest dist
+            --dest dist `
+            --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Build .msi
         run: |
           jpackage `
-            --input target `
+            --input staging `
             --main-jar cat.jar `
             --main-class com.cat.Main `
             --name cat-java `
             --app-version $($env:GITHUB_REF_NAME -replace '^v','') `
             --type msi `
-            --dest dist
+            --dest dist `
+            --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -124,27 +136,32 @@ jobs:
       - name: Build JAR
         run: mvn -q package -DskipTests
 
+      - name: Prepare staging
+        run: mkdir -p staging && cp target/cat.jar staging/
+
       - name: Build .dmg
         run: |
           jpackage \
-            --input target \
+            --input staging \
             --main-jar cat.jar \
             --main-class com.cat.Main \
             --name cat-java \
             --app-version ${GITHUB_REF_NAME#v} \
             --type dmg \
-            --dest dist
+            --dest dist \
+            --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Build .pkg
         run: |
           jpackage \
-            --input target \
+            --input staging \
             --main-jar cat.jar \
             --main-class com.cat.Main \
             --name cat-java \
             --app-version ${GITHUB_REF_NAME#v} \
             --type pkg \
-            --dest dist
+            --dest dist \
+            --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
