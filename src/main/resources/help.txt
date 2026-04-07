@@ -1,0 +1,26 @@
+Utilisation : cat [OPTION]... [FICHIER]...
+Concaténer les FICHIERs vers la sortie standard.
+
+Sans FICHIER ou quand FICHIER est -, lire l'entrée standard.
+
+  -A, --show-all           équivalent à -vET
+  -b, --number-nonblank    numéroter les lignes non vides en sortie, annule -n
+  -e                       équivalent à -vE
+  -E, --show-ends          afficher $ à la fin de chaque ligne
+  -n, --number             numéroter toutes les lignes en sortie
+  -s, --squeeze-blank      supprimer les lignes vides qui se répètent en sortie
+  -t                       équivalent à -vT
+  -T, --show-tabs          afficher les caractères TAB comme ^I
+  -u                       (ignoré)
+  -v, --show-nonprinting   utiliser les notations ^ et M-, sauf pour LFD et TAB
+      --help        afficher l'aide et quitter
+      --version     afficher des informations de version et quitter
+
+Exemples :
+  cat f - g  Afficher le contenu de f, suivi de l'entrée standard, puis du contenu de g.
+  cat        Copier l'entrée standard vers la sortie standard.
+
+Aide en ligne de GNU coreutils : <https://www.gnu.org/software/coreutils/>
+Signalez les problèmes de traduction à : <traduc@traduc.org>
+Documentation complète <https://www.gnu.org/software/coreutils/cat>
+ou disponible localement via: info '(coreutils) cat invocation'

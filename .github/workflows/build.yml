@@ -1,0 +1,172 @@
+name: Build
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Build JAR
+        run: mvn -q package -DskipTests
+
+      - name: Build .deb
+        run: |
+          jpackage \
+            --input target \
+            --main-jar cat.jar \
+            --main-class com.cat.Main \
+            --name cat-java \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --type deb \
+            --dest dist
+
+      - name: Build AppImage
+        run: |
+          jpackage \
+            --input target \
+            --main-jar cat.jar \
+            --main-class com.cat.Main \
+            --name cat-java \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --type app-image \
+            --dest appimage-build
+          # Package as AppImage
+          sudo apt-get install -y libfuse2
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+          mkdir -p AppDir/usr/bin AppDir/usr/lib
+          cp -r appimage-build/cat-java/* AppDir/usr/
+          mv AppDir/usr/bin/cat-java AppDir/AppRun || cp appimage-build/cat-java/bin/cat-java AppDir/AppRun
+          chmod +x AppDir/AppRun
+          cat > AppDir/cat-java.desktop << 'DESKTOP'
+          [Desktop Entry]
+          Name=cat-java
+          Exec=cat-java
+          Icon=cat-java
+          Type=Application
+          Categories=Utility;
+          DESKTOP
+          touch AppDir/cat-java.png
+          ARCH=x86_64 ./appimagetool AppDir dist/cat-java-x86_64.AppImage
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: dist/*
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Build JAR
+        run: mvn -q package -DskipTests
+
+      - name: Build .exe
+        run: |
+          jpackage `
+            --input target `
+            --main-jar cat.jar `
+            --main-class com.cat.Main `
+            --name cat-java `
+            --app-version $($env:GITHUB_REF_NAME -replace '^v','') `
+            --type exe `
+            --dest dist
+
+      - name: Build .msi
+        run: |
+          jpackage `
+            --input target `
+            --main-jar cat.jar `
+            --main-class com.cat.Main `
+            --name cat-java `
+            --app-version $($env:GITHUB_REF_NAME -replace '^v','') `
+            --type msi `
+            --dest dist
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages
+          path: dist/*
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Build JAR
+        run: mvn -q package -DskipTests
+
+      - name: Build .dmg
+        run: |
+          jpackage \
+            --input target \
+            --main-jar cat.jar \
+            --main-class com.cat.Main \
+            --name cat-java \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --type dmg \
+            --dest dist
+
+      - name: Build .pkg
+        run: |
+          jpackage \
+            --input target \
+            --main-jar cat.jar \
+            --main-class com.cat.Main \
+            --name cat-java \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --type pkg \
+            --dest dist
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-packages
+          path: dist/*
+
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
