@@ -1,0 +1,16 @@
+# Build
+target/
+
+# IDE
+.classpath
+.project
+.settings/
+*.iml
+.idea/
+.vscode/
+
+# Claude
+.claude/
+
+# OS
+.DS_Store
