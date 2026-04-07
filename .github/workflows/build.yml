@@ -33,6 +33,7 @@ jobs:
             --app-version ${GITHUB_REF_NAME#v} \
             --type deb \
             --dest dist \
+            --add-modules java.base \
             --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Build AppImage
@@ -45,6 +46,7 @@ jobs:
             --app-version ${GITHUB_REF_NAME#v} \
             --type app-image \
             --dest appimage-build \
+            --add-modules java.base \
             --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
           # Package as AppImage
           sudo apt-get install -y libfuse2
@@ -101,6 +103,7 @@ jobs:
             --app-version $($env:GITHUB_REF_NAME -replace '^v','') `
             --type exe `
             --dest dist `
+            --add-modules java.base `
             --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Build .msi
@@ -113,6 +116,7 @@ jobs:
             --app-version $($env:GITHUB_REF_NAME -replace '^v','') `
             --type msi `
             --dest dist `
+            --add-modules java.base `
             --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Upload Windows artifacts
@@ -149,6 +153,7 @@ jobs:
             --app-version ${GITHUB_REF_NAME#v} \
             --type dmg \
             --dest dist \
+            --add-modules java.base \
             --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Build .pkg
@@ -161,6 +166,7 @@ jobs:
             --app-version ${GITHUB_REF_NAME#v} \
             --type pkg \
             --dest dist \
+            --add-modules java.base \
             --jlink-options "--strip-debug --no-man-pages --no-header-files --compress zip-6"
 
       - name: Upload macOS artifacts
