@@ -8,7 +8,7 @@ public class Main {
   /** Parses arguments and runs cat. */
   public static void main(String[] args) {
     if (args.length == 0) {
-      new Cat();
+      new Cat().processArg("-");
       return;
     }
 
@@ -20,7 +20,7 @@ public class Main {
     boolean squeezeBlank = false;
 
     for (String arg : args) {
-      if (arg.equals("--help")) {
+      if ("--help".equals(arg)) {
         Cat.printHelp();
         return;
       }
@@ -46,7 +46,7 @@ public class Main {
             return;
           }
         }
-      } else if (arg.startsWith("-") && !arg.equals("-")) {
+      } else if (arg.startsWith("-") && !"-".equals(arg)) {
         for (int i = 1; i < arg.length(); i++) {
           char c = arg.charAt(i);
           switch (c) {
@@ -87,7 +87,7 @@ public class Main {
         nbLine, nbNonBlank, showEnds,
         showTabs, showNonPrinting, squeezeBlank);
     String[] files = Arrays.stream(args)
-        .filter(arg -> !arg.startsWith("-") || arg.equals("-"))
+        .filter(arg -> !arg.startsWith("-") || "-".equals(arg))
         .toArray(String[]::new);
     if (files.length == 0) {
       cat.processArg("-");

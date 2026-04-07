@@ -18,19 +18,17 @@ import java.util.List;
  * @author Jojokes
  */
 public class Cat {
-  boolean nbLine;
-  boolean nbNonBlank;
-  boolean showEnds;
-  boolean showTabs;
-  boolean showNonPrinting;
-  boolean squeezeBlank;
-  int line = 0;
-  int consecutiveBlanks = 0;
+  private boolean nbLine;
+  private boolean nbNonBlank;
+  private boolean showEnds;
+  private boolean showTabs;
+  private boolean showNonPrinting;
+  private boolean squeezeBlank;
+  private int line = 0;
+  private int consecutiveBlanks = 0;
 
-  /** Creates a new Cat reading from stdin. */
-  public Cat() {
-    readStream(System.in);
-  }
+  /** Creates a new Cat with default options. */
+  public Cat() {}
 
   /** Creates a new Cat with options. */
   public Cat(boolean nbLine, boolean nbNonBlank, boolean showEnds,
@@ -53,7 +51,7 @@ public class Cat {
    * @param arg file path, glob pattern, or "-" for stdin
    */
   public void processArg(String arg) {
-    if (arg.equals("-")) {
+    if ("-".equals(arg)) {
       readStream(System.in);
       return;
     }
